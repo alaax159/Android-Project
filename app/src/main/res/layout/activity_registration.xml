@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Confirm Email Address"
-        android:inputType="textPassword" />
+        android:inputType="textEmailAddress" />
 
 
     <EditText

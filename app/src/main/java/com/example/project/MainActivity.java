@@ -1,5 +1,6 @@
 package com.example.project;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -15,7 +16,7 @@ import androidx.activity.OnBackPressedCallback;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
-
+    SharedPreManager sharedPref;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle toggle;
@@ -64,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_info) {
                     Toast.makeText(MainActivity.this, "Library Info", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_logout) {
-                    Toast.makeText(MainActivity.this, "Logout", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
 
                 drawerLayout.closeDrawer(GravityCompat.START);

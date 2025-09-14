@@ -7,10 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
-
+    // Database name LibraryDB and version 3
     // Keep constructor signature as you had it
     public DataBaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        // You can pass "BookDB" and 2 from the Activity to force a rebuild
+
         super(context, name, factory, version);
     }
 
@@ -63,16 +63,49 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "added_date TEXT," +
                 "FOREIGN KEY (student_id) REFERENCES Students(id) ON DELETE CASCADE," +
                 "FOREIGN KEY (book_id) REFERENCES Books(id) ON DELETE CASCADE)");
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Simple reset strategy (drop & recreate)
-        db.execSQL("DROP TABLE IF EXISTS Books");
-        db.execSQL("DROP TABLE IF EXISTS Students");
-        db.execSQL("DROP TABLE IF EXISTS Reservations");
-        db.execSQL("DROP TABLE IF EXISTS Reading_List");
         onCreate(db);
+    }
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        onCreate(db);
+    }
+    public void registerStudent(String universityId, String firstName, String lastName, String email, String passwordHash, String department, String level){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("university_id", universityId);
+        contentValues.put("first_name", firstName);
+        contentValues.put("last_name", lastName);
+        contentValues.put("email", email);
+        String hashedPassword = CaeserCipher.encrypt(passwordHash, 5);
+        contentValues.put("password_hash", hashedPassword);
+        contentValues.put("department", department);
+        contentValues.put("level", level);
+        db.insert("Students", null, contentValues);
+
+    }
+    public boolean checkUniversityId(String universityId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM Students WHERE university_id = ?", new String[]{universityId});
+        return cursor.getCount() <= 0;
+
+    }
+    public Cursor checkInformations(String emailOrUniversityId, String password){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String HashedPassword = CaeserCipher.encrypt(password, 5);
+        if(emailOrUniversityId.matches("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@university.edu$") || emailOrUniversityId.matches("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@library.edu$")){
+            Cursor cursor = db.rawQuery("SELECT * FROM Students WHERE email = ? AND password_hash = ?", new String[]{emailOrUniversityId, HashedPassword});
+            return cursor;
+        }else{
+            Cursor cursor = db.rawQuery("SELECT * FROM Students WHERE university_id = ? AND password_hash = ?", new String[]{emailOrUniversityId, HashedPassword});
+            return cursor;
+        }
+
     }
 }
 

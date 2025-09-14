@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Palette -->
+    <color name="colorPrimary">#1E3A8A</color> <!-- Deep Blue -->
+    <color name="colorPrimaryDark">#172554</color> <!-- Darker Blue -->
+    <color name="colorAccent">#F59E0B</color> <!-- Amber -->
+
+    <!-- Secondary & Background -->
+    <color name="colorSecondary">#10B981</color> <!-- Emerald Green -->
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorSurface">#F3F4F6</color>
+    <color name="colorText">#111827</color>
+    <color name="colorLogoBackground">#F0EDED</color>
 </resources>

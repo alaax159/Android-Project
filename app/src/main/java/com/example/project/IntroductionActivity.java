@@ -25,7 +25,8 @@ public class IntroductionActivity extends AppCompatActivity {
 
         Button btnGetStarted = findViewById(R.id.btnGetStarted);
         btnGetStarted.setOnClickListener(v -> {
-            Intent intent = new Intent(IntroductionActivity.this, MainActivity.class);
+            btnGetStarted.setText("Connecting...");
+            Intent intent = new Intent(IntroductionActivity.this, LoginActivity.class);
             startActivity(intent);
         });
     }
