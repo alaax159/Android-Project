@@ -107,5 +107,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
 
     }
+    public Cursor getBooks() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT " +
+                "b.title AS title, " +
+                "b.author AS author, " +
+                "r.reservation_date AS reservation_date, " +
+                "r.due_date AS due_date, " +
+                "r.status AS status, " +
+                "r.return_date AS return_date " +
+                "FROM Reservations r " +
+                "JOIN Books b ON r.book_id = b.id";
+
+        return db.rawQuery(query, null);
+    }
 }
 

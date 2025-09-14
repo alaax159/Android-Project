@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Dashboard", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_borrowed_books) {
                     Toast.makeText(MainActivity.this, "Borrowed Books", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new MyBorrowedBooks())
+                            .commit();
                 } else if (id == R.id.nav_reading_list) {
                     Toast.makeText(MainActivity.this, "Reading List", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_new_arrivals) {
@@ -88,4 +91,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (toggle != null) {
+            toggle.syncState();
+        }
+        navigationView.setCheckedItem(R.id.nav_dashboard);
+    }
+
 }
