@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".RegistrationActivity">
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/library_logo"
+        android:layout_gravity="center"/>
+
+    <EditText
+        android:id="@+id/universityID"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text"
+        android:text=""
+        android:hint="University ID"
+        android:layout_marginLeft="20dp"/>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/firstName"
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="text"
+            android:text=""
+            android:hint="First Name"
+            android:layout_marginLeft="20dp"/>
+
+        <EditText
+            android:id="@+id/lastName"
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="text"
+            android:text=""
+            android:hint="Last Name"/>
+    </LinearLayout>
+
+
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="350dp"
+        android:layout_marginLeft="20dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:hint="Email Address"/>
+
+
+    <EditText
+        android:layout_marginTop="10dp"
+        android:id="@+id/confirmedEmail"
+        android:layout_width="350dp"
+        android:layout_marginLeft="20dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Confirm Email Address"
+        android:inputType="textPassword" />
+
+
+    <EditText
+        android:layout_marginTop="10dp"
+        android:id="@+id/password"
+        android:layout_width="350dp"
+        android:layout_marginLeft="20dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:layout_marginTop="10dp"
+        android:id="@+id/confirmPassword"
+        android:layout_width="350dp"
+        android:layout_marginLeft="20dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Confirm Password"
+        android:inputType="textPassword" />
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:ignore="MissingClass">
+        <com.hbb20.CountryCodePicker
+            android:layout_marginLeft="20dp"
+            android:id="@+id/countryCodePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:ccp_defaultNameCode="PS" />
+        <EditText
+            android:id="@+id/phoneNumber"
+            android:layout_width="180dp"
+            android:ems="10"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:hint="Phone Number"
+            android:paddingLeft="5dp"/>
+
+    </LinearLayout>
+
+
+    <Spinner
+        android:id="@+id/academicLevel"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:spinnerMode="dropdown" />
+
+
+    <Spinner
+        android:id="@+id/department"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:spinnerMode="dropdown"/>
+
+
+
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"></Button>
+</LinearLayout>

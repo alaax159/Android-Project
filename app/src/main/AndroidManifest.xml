@@ -12,9 +12,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Project">
         <activity
-            android:name=".IntroductionActivity"
+            android:name=".RegistrationActivity"
             android:exported="false" />
-        <!-- Splash screen is the first activity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".IntroductionActivity"
+            android:exported="false" /> <!-- Splash screen is the first activity -->
         <activity
             android:name=".SplashActivity"
             android:exported="true">
