@@ -73,7 +73,7 @@ public class MyBorrowedBooks extends Fragment {
         BorrowedBooksAdapter adapter = new BorrowedBooksAdapter();
         rv.setAdapter(adapter);
 
-        db = new DataBaseHelper(requireContext(), "LibraryDB3", null, 3);
+        db = new DataBaseHelper(requireContext(), "LibraryDB", null, 4);
 
         List<BorrowedBook> data = new ArrayList<>();
         try (Cursor cursor = db.getBooks()) {
@@ -100,9 +100,13 @@ public class MyBorrowedBooks extends Fragment {
                     }
                     data.add(new BorrowedBook(title, author, resDate, dueDate, returnDate, status, fine));
                 }
+                adapter.setItems(data);
+            }else {
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        adapter.setItems(data);
+
         return root;
     }
 }

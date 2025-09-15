@@ -1,14 +1,27 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
+    <!-- Base application theme -->
     <style name="Base.Theme.Project" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand colors -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
-        <item name="colorOnPrimary">@color/colorLogoBackground</item>
+
+        <!-- Secondary/accent colors -->
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!-- Default text color -->
         <item name="android:textColor">@color/colorText</item>
-        <item name="android:background">@color/colorLogoBackground</item>
+
     </style>
 
     <style name="Theme.Project" parent="Base.Theme.Project" />
+
+    <!-- Toolbar style override -->
+    <style name="Widget.Project.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="subtitleTextColor">@android:color/white</item>
+    </style>
+
 </resources>

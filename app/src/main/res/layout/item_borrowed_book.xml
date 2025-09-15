@@ -37,30 +37,29 @@
             android:textSize="14sp"
             android:textColor="#666"/>
 
-        <!-- Dates Info -->
         <TextView
             android:id="@+id/tvBorrowDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Borrow Date: 2025-09-01"/>
+            android:text="Borrow Date: —"/>
 
         <TextView
             android:id="@+id/tvDueDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Due Date: 2025-09-10"/>
+            android:text="Due Date: —"/>
 
         <TextView
             android:id="@+id/tvReturnDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Return Date: -"/>
+            android:text="Return Date: —"/>
 
         <TextView
             android:id="@+id/tvStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Status: Active"
+            android:text="Status: —"
             android:textStyle="bold"/>
 
         <TextView
@@ -68,6 +67,5 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Fine: 0.00"/>
-
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
