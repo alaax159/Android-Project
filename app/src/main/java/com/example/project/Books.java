@@ -12,6 +12,13 @@ public class Books {
     public Books() {
     }
 
+    public Books(String title, int id, String author, int availability) {
+        this.title = title;
+        this.id = id;
+        this.author = author;
+        this.availability = availability;
+    }
+
     public Books(int publication_year, String cover_url, int availability, String category, String isbn, String author, String title, int id) {
         this.publication_year = publication_year;
         this.cover_url = cover_url;

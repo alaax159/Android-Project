@@ -3,6 +3,7 @@ package com.example.project;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.time.LocalDate;
@@ -22,7 +24,23 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class MyBorrowedBooks extends Fragment {
-    DataBaseHelper db;
+
+    private int SID;
+    private BorrowedBooksAdapter adapter;
+    private DataBaseHelper db;
+
+    public interface CommunicatorBorrowedBooks {
+        void setDataBorrowedBooks(int data);
+    }
+
+    public void setData(int data) {
+        this.SID = data;
+        // If adapter already exists, reload books
+        if (db != null && adapter != null) {
+            reloadBooks();
+        }
+    }
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -70,43 +88,56 @@ public class MyBorrowedBooks extends Fragment {
 
         RecyclerView rv = root.findViewById(R.id.recyclerBorrowedBooks);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-        BorrowedBooksAdapter adapter = new BorrowedBooksAdapter();
+        adapter = new BorrowedBooksAdapter();
         rv.setAdapter(adapter);
 
-        db = new DataBaseHelper(requireContext(), "LibraryDB", null, 4);
+        db = new DataBaseHelper(requireContext(), "test11", null, 4);
 
+//        if (SID != 0) {
+//
+//        }
+        reloadBooks();
+        return root;
+    }
+
+    private void reloadBooks() {
         List<BorrowedBook> data = new ArrayList<>();
-        try (Cursor cursor = db.getBooks()) {
+        View view = getView();
+        //Toolbar toolbar = view.findViewById(R.id.toolbar);
+        //toolbar.setTitle("eeeeee");
+        try (Cursor cursor = db.getBooks(String.valueOf(1))) {
             if (cursor != null) {
+                //toolbar.setTitle("eeeeee");
                 while (cursor.moveToNext()) {
                     String title      = cursor.isNull(0) ? null : cursor.getString(0);
                     String author     = cursor.isNull(1) ? null : cursor.getString(1);
                     String resDate    = cursor.isNull(2) ? null : cursor.getString(2);
                     String dueDate    = cursor.isNull(3) ? null : cursor.getString(3);
                     String status     = cursor.isNull(4) ? null : cursor.getString(4);
-                    String returnDate = cursor.isNull(5) ? null : cursor.getString(5);
-                    String fine       = "0.00";
-                    LocalDate today = LocalDate.now();
-                    if (dueDate != null) {
-                        LocalDate dueDate2 = LocalDate.parse(dueDate);
 
+                    String returnDate = null;
+                    int returnDateIndex = cursor.getColumnIndex("return_date");
+                    if (returnDateIndex != -1) {
+                        returnDate = cursor.getString(returnDateIndex);
+                    }
+
+                    String fine = "0.00";
+                    if (dueDate != null) {
+                        LocalDate today = LocalDate.now();
+                        LocalDate dueDate2 = LocalDate.parse(dueDate);
                         if (today.isAfter(dueDate2)) {
-                            fine = "50";   // overdue → apply fine
-                        } else if (today.isBefore(dueDate2)) {
-                            fine = "0.00"; // still on time
-                        } else {
-                            fine = "0.00"; // due today, no fine
+                            fine = "50";
                         }
                     }
+
                     data.add(new BorrowedBook(title, author, resDate, dueDate, returnDate, status, fine));
                 }
                 adapter.setItems(data);
             }else {
+                //toolbar.setTitle("eeeeee");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return root;
     }
 }

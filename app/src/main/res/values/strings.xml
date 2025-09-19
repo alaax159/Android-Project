@@ -5,4 +5,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="student_profile">Student profile picture</string>
+    <string name="borrow">Borrow</string>
+    <string name="info">Info</string>
+    <string name="book_cover">Book cover</string>
+    <string name="remove_from_fav">Remove</string>
 </resources>

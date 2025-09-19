@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             style="?attr/toolbarStyle"
-            app:title="Library"
+            app:title="Library:"
             android:background="@color/colorPrimary"
             app:titleTextColor="@color/colorLogoBackground"
             app:navigationIconTint="@color/colorBackground"

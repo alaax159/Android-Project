@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +18,7 @@ import androidx.activity.OnBackPressedCallback;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.CommunicatorBorrowedBooks {
     SharedPreManager sharedPref;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        // Hamburger toggle
+
         toggle = new ActionBarDrawerToggle(
                 this,
                 drawerLayout,
@@ -50,15 +51,16 @@ public class MainActivity extends AppCompatActivity {
 
         navigationView.setCheckedItem(R.id.nav_dashboard);
         Toast.makeText(MainActivity.this, "Dashboard", Toast.LENGTH_SHORT).show();
-        db = new DataBaseHelper(MainActivity.this, "LibraryDB", null, 4);
+        db = new DataBaseHelper(MainActivity.this, "test11", null, 4);
 
 
+
+        student = new Student();
         String emailShared = sharedPref.readString("email", "");
         if (emailShared.contains("@")){
             System.out.println("qq");
         }else{
             Cursor cursor = db.StudentDataID(emailShared);
-            student = new Student();
             if (cursor.moveToFirst()) {
                 student.setId(cursor.getInt(0));
                 student.setUniversityId(cursor.getString(1));
@@ -73,22 +75,32 @@ public class MainActivity extends AppCompatActivity {
 
             if (student != null) {
 
-                android.view.View headerView = navigationView.getHeaderView(0);
+                View headerView = navigationView.getHeaderView(0);
 
                 TextView tvStudentName = headerView.findViewById(R.id.tvStudentName);
                 TextView tvDepartment = headerView.findViewById(R.id.tvDepartment);
                 TextView tvLevel = headerView.findViewById(R.id.tvLevel);
                 TextView tvUniversityId = headerView.findViewById(R.id.tvUniversityId);
 
-                // Set values
                 tvStudentName.setText(student.getFirstName() + " " + student.getLastName());
                 tvDepartment.setText("Department: " + student.getDepartment());
                 tvLevel.setText("Level: " + student.getLevel());
-                tvUniversityId.setText("ID: " + student.getUniversityId());
+                tvUniversityId.setText("ID: " + student.getId());
             }
-
-
         }
+
+//        Rev r = new Rev();
+//        Cursor c = db.getAllReservations();
+//        while (c.moveToNext()) {
+//            r.setId(c.getInt(0));
+//            r.setStudent_id(c.getInt(1));
+//            r.setBook_id(c.getInt(2));
+//            r.setReservation_date(c.getString(3));
+//            r.setDue_date(c.getString(4));
+//            r.setReturn_date(c.getString(5));
+//            tvUniversityId.setText("ID: " + r.getReservation_date());
+//            break;
+//        }
 
 
         // Handle navigation item clicks
@@ -101,14 +113,27 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Dashboard", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_borrowed_books) {
                     Toast.makeText(MainActivity.this, "Borrowed Books", Toast.LENGTH_SHORT).show();
+                    MyBorrowedBooks fragment = new MyBorrowedBooks();
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, new MyBorrowedBooks())
+                            .replace(R.id.container, fragment)
                             .commit();
+
+                    // Now send SID through interface
+                    //setDataBorrowedBooks(String.valueOf(student.getId()));
+
+                    toolbar.setTitle("Library borrowed books");
                 } else if (id == R.id.nav_reading_list) {
                     Toast.makeText(MainActivity.this, "Reading List", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new ReadingListSection())
+                            .commit();
+                    toolbar.setTitle("Library reading list");
                 } else if (id == R.id.nav_new_arrivals) {
                     Toast.makeText(MainActivity.this, "New Arrivals", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_profile) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new ProfileManagement())
+                            .commit();
                     Toast.makeText(MainActivity.this, "Profile Management", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_info) {
                     Toast.makeText(MainActivity.this, "Library Info", Toast.LENGTH_SHORT).show();
@@ -146,4 +171,12 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setCheckedItem(R.id.nav_dashboard);
     }
 
+    @Override
+    public void setDataBorrowedBooks(int data) {
+
+    }
+//    @Override
+//    public String setDataBorrowedBooks(String data) {
+//       return data;
+//    }
 }

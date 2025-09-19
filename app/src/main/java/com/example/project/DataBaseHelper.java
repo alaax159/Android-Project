@@ -51,6 +51,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "book_id INTEGER NOT NULL," +
                 "reservation_date TEXT NOT NULL," +
                 "due_date TEXT," +
+                "return_date TEXT," +
                 "status TEXT," +
                 "FOREIGN KEY (student_id) REFERENCES Students(id) ON DELETE CASCADE," +
                 "FOREIGN KEY (book_id) REFERENCES Books(id) ON DELETE CASCADE)");
@@ -110,7 +111,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
 
     }
-    public Cursor getBooks() {
+    public Cursor getBooks(String SId) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String query = "SELECT " +
@@ -118,12 +119,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "b.author AS author, " +
                 "r.reservation_date AS reservation_date, " +
                 "r.due_date AS due_date, " +
-                "r.status AS status, " +
-                "r.return_date AS return_date " +
+                "r.status AS status " +
                 "FROM Reservations r " +
-                "JOIN Books b ON r.book_id = b.id";
+                "JOIN Books b ON r.book_id = b.id " +
+                "WHERE r.student_id = ?";
 
-        return db.rawQuery(query, null);
+        return db.rawQuery(query, new String[]{SId});
     }
 
     public Cursor StudentDataID(String universityId){
@@ -131,6 +132,43 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM Students WHERE university_id = ?", new String[]{universityId});
 
     }
+
+    public Cursor getAllBooksReading(String SId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT b.title, b.author, b.availability, b.id " +
+                "FROM Reading_List r " +
+                "JOIN Books b ON r.book_id = b.id " +
+                "WHERE r.student_id = ?";
+        return db.rawQuery(query, new String[]{SId});
+    }
+    public int removeBookFromReadingList(String studentId, int bookId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(
+                "Reading_List",
+                "student_id = ? AND book_id = ?",
+                new String[]{studentId, String.valueOf(bookId)}
+        );
+    }
+
+    public boolean addToBorrowedBooks(int studentId, int bookId, String reservationDate, String dueDate, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("student_id", studentId);
+        values.put("book_id", bookId);
+        values.put("reservation_date", reservationDate);
+        values.put("due_date", dueDate);
+        values.put("status", status);
+
+        long result = db.insert("Reservations", null, values);
+
+        return result != -1;
+    }
+
+    public Cursor BookInfo(String bookId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT * FROM Books WHERE id = ?", new String[]{bookId});
+    }
+
 
     public void insertDummyBooks() {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -169,21 +207,21 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void insertDummyReservations() {
         SQLiteDatabase db = this.getWritableDatabase();
 
-//        ContentValues r1 = new ContentValues();
-//        r1.put("student_id", 1);   // assuming student with id = 1 exists
-//        r1.put("book_id", 2);      // Clean Code
-//        r1.put("reservation_date", "2025-09-15");
-//        r1.put("due_date", "2025-10-15");
-//        r1.put("status", "Borrowed");
-//        db.insert("Reservations", null, r1);
-//
-//        ContentValues r2 = new ContentValues();
-//        r2.put("student_id", 1);
-//        r2.put("book_id", 3);      // AI book
-//        r2.put("reservation_date", "2025-09-10");
-//        r2.put("due_date", "2025-09-24");
-//        r2.put("status", "Returned");
-//        db.insert("Reservations", null, r2);
+        ContentValues r1 = new ContentValues();
+        r1.put("student_id", 1);   // assuming student with id = 1 exists
+        r1.put("book_id", 2);      // Clean Code
+        r1.put("reservation_date", "2025-09-15");
+        r1.put("due_date", "2025-10-15");
+        r1.put("status", "Borrowed");
+        db.insert("Reservations", null, r1);
+
+        ContentValues r2 = new ContentValues();
+        r2.put("student_id", 1);
+        r2.put("book_id", 3);      // AI book
+        r2.put("reservation_date", "2025-09-10");
+        r2.put("due_date", "2025-09-24");
+        r2.put("status", "Returned");
+        db.insert("Reservations", null, r2);
 
         // Ahmad Odeh -> Introduction to Algorithms
         ContentValues r3 = new ContentValues();
@@ -197,7 +235,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         // Sara Khalil -> Clean Code
         ContentValues r4 = new ContentValues();
         r4.put("student_id", 2);
-        r4.put("book_id", 2);  // Clean Code
+        r4.put("book_id", 2);
         r4.put("reservation_date", "2025-09-11");
         r4.put("due_date", "2025-09-25");
         r4.put("status", "Borrowed");
@@ -243,7 +281,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.insert("Reading_List", null, rl1);
 
         ContentValues rl2 = new ContentValues();
-        rl2.put("student_id", 1);
+        rl2.put("student_id", 2);
         rl2.put("book_id", 2);   // Clean Code
         rl2.put("added_date", "2025-09-14");
         db.insert("Reading_List", null, rl2);
@@ -260,7 +298,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s1.put("password_hash", CaeserCipher.encrypt("Pass@123", 5));
         s1.put("department", "Computer Science");
         s1.put("level", "Junior");
-        s1.put("phone", "+970599111111");
         db.insert("Students", null, s1);
 
         ContentValues s2 = new ContentValues();
@@ -271,7 +308,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s2.put("password_hash", CaeserCipher.encrypt("S@ra4567", 5));
         s2.put("department", "Engineering");
         s2.put("level", "Sophomore");
-        s2.put("phone", "+970599222222");
         db.insert("Students", null, s2);
 
         ContentValues s3 = new ContentValues();
@@ -282,7 +318,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s3.put("password_hash", CaeserCipher.encrypt("Om@r7890", 5));
         s3.put("department", "Business");
         s3.put("level", "Senior");
-        s3.put("phone", "+970599333333");
         db.insert("Students", null, s3);
 
         ContentValues s4 = new ContentValues();
@@ -293,7 +328,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s4.put("password_hash", CaeserCipher.encrypt("L!na2025", 5));
         s4.put("department", "Literature");
         s4.put("level", "Freshman");
-        s4.put("phone", "+970599444444");
         db.insert("Students", null, s4);
 
         ContentValues s5 = new ContentValues();
@@ -304,8 +338,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s5.put("password_hash", CaeserCipher.encrypt("Y0us3f!", 5));
         s5.put("department", "Medicine");
         s5.put("level", "Graduate");
-        s5.put("phone", "+970599555555");
         db.insert("Students", null, s5);
     }
+
+    public int getStudentCount() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM Reservations", null);
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+    public Cursor getAllReservations() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM Reservations", null);
+    }
+
 }
 

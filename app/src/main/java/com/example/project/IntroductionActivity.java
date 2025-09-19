@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class IntroductionActivity extends AppCompatActivity {
 
+    DataBaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,5 +30,8 @@ public class IntroductionActivity extends AppCompatActivity {
             Intent intent = new Intent(IntroductionActivity.this, LoginActivity.class);
             startActivity(intent);
         });
+
+        db = new DataBaseHelper(IntroductionActivity.this, "test11", null, 4);
+
     }
 }
