@@ -12,7 +12,7 @@ public class SharedPreManager {
     private SharedPreferences.Editor editor = null;
 
     // Constructor (no void!)
-    private SharedPreManager(Context context) {
+    SharedPreManager(Context context) {
         sharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME,
                 SHARED_PREF_PRIVATE);
         editor = sharedPreferences.edit();

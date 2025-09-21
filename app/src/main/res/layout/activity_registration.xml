@@ -117,9 +117,7 @@
             android:inputType="phone"
             android:hint="Phone Number"
             android:paddingLeft="5dp"/>
-
     </LinearLayout>
-
 
     <Spinner
         android:id="@+id/academicLevel"
@@ -129,7 +127,6 @@
         android:layout_marginTop="20dp"
         android:spinnerMode="dropdown" />
 
-
     <Spinner
         android:id="@+id/department"
         android:layout_width="350dp"
@@ -137,9 +134,6 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
         android:spinnerMode="dropdown"/>
-
-
-
 
     <Button
         android:id="@+id/registerButton"

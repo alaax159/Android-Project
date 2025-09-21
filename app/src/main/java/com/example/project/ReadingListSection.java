@@ -29,6 +29,7 @@ import java.util.List;
  */
 public class ReadingListSection extends Fragment {
     DataBaseHelper db;
+    SharedPreManager sharedPref;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -74,17 +75,17 @@ public class ReadingListSection extends Fragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_reading_list_section, container, false);
         LinearLayout containerBooks = root.findViewById(R.id.containerBooks);
+        sharedPref = new SharedPreManager(requireContext());
+        String sid = sharedPref.readString("student_id", "");
+        db = new DataBaseHelper(requireContext(), "test11", null, 4);
 
-        db = new DataBaseHelper(requireContext(), "AdnanDB", null, 4);
-
-        try (Cursor cursor = db.getAllBooksReading("1")) {
+        try (Cursor cursor = db.getAllBooksReading(sid)) {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     String title       = cursor.getString(0);
                     String author      = cursor.getString(1);
                     int availability   = cursor.getInt(2);
                     int bookId         = cursor.getInt(3);
-
 
                     View card = inflater.inflate(R.layout.books_card, containerBooks, false);
 
@@ -96,11 +97,9 @@ public class ReadingListSection extends Fragment {
                     MaterialButton btnInfo = card.findViewById(R.id.btnInfo);
                     MaterialButton btnRemove = card.findViewById(R.id.btnRemoveFav);
 
-
                     Title.setText(title);
                     Author.setText(author);
                     Availability.setText(availability == 1 ? "Available" : "Not Available");
-
 
                     btnBorrow.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -118,11 +117,11 @@ public class ReadingListSection extends Fragment {
                                                 bookId,
                                                 reservationDate,
                                                 dueDate,
-                                                "Borrowed"
+                                                "Pending"
                                         );
                                         if (success) {
                                             Toast.makeText(requireContext(),
-                                                    "Borrowed " + title + " for " + weeks + " week(s)",
+                                                    "Waiting librarian to approve your request " + title + " for " + weeks + " week(s)",
                                                     Toast.LENGTH_SHORT).show();
 
                                             btnBorrow.setEnabled(false);

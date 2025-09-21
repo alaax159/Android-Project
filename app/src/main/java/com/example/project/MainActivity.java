@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
 
         navigationView.setCheckedItem(R.id.nav_dashboard);
         Toast.makeText(MainActivity.this, "Dashboard", Toast.LENGTH_SHORT).show();
-        db = new DataBaseHelper(MainActivity.this, "AdnanDB", null, 4);
+        db = new DataBaseHelper(MainActivity.this, "test11", null, 4);
 
 
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
         if (emailShared.contains("@")){
             System.out.println("qq");
         }else{
-            Cursor cursor = db.StudentDataID(emailShared);
+            Cursor cursor = db.StudentDataUniversityID(emailShared);
             if (cursor.moveToFirst()) {
                 student.setId(cursor.getInt(0));
                 student.setUniversityId(cursor.getString(1));
@@ -88,10 +88,8 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
                 tvUniversityId.setText("ID: " + student.getId());
             }
         }
-        dashboardFragment fragmentMain = new dashboardFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, fragmentMain)
-                .commit();
+
+        sharedPref.writeString("student_id", String.valueOf(student.getId()));
 
 //        Rev r = new Rev();
 //        Cursor c = db.getAllReservations();
@@ -118,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, fragment)
                             .commit();
+                    Toast.makeText(MainActivity.this, "Dashboard", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_borrowed_books) {
                     Toast.makeText(MainActivity.this, "Borrowed Books", Toast.LENGTH_SHORT).show();
                     MyBorrowedBooks fragment = new MyBorrowedBooks();
@@ -144,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
                     Toast.makeText(MainActivity.this, "Profile Management", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_info) {
                     Toast.makeText(MainActivity.this, "Library Info", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new ContactUs())
+                            .commit();
                 } else if (id == R.id.nav_logout) {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);

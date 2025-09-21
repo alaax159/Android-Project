@@ -24,7 +24,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class MyBorrowedBooks extends Fragment {
-
+    SharedPreManager sharedPref;
     private int SID;
     private BorrowedBooksAdapter adapter;
     private DataBaseHelper db;
@@ -105,7 +105,9 @@ public class MyBorrowedBooks extends Fragment {
         View view = getView();
         //Toolbar toolbar = view.findViewById(R.id.toolbar);
         //toolbar.setTitle("eeeeee");
-        try (Cursor cursor = db.getBooks(String.valueOf(1))) {
+        sharedPref = new SharedPreManager(requireContext());
+        String sid = sharedPref.readString("student_id", "");
+        try (Cursor cursor = db.getBooks(sid)) {
             if (cursor != null) {
                 //toolbar.setTitle("eeeeee");
                 while (cursor.moveToNext()) {

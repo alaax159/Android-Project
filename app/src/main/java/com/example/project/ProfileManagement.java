@@ -1,13 +1,19 @@
 package com.example.project;
 
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -19,6 +25,7 @@ import com.google.android.material.textfield.TextInputLayout;
  * create an instance of this fragment.
  */
 public class ProfileManagement extends Fragment {
+    SharedPreManager sharedPref;
     DataBaseHelper db;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,48 +71,160 @@ public class ProfileManagement extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile_management, container, false);
-        db = new DataBaseHelper(requireContext(), "AdnanDB", null, 4);
-        Cursor cursor = db.StudentDataID("1");
-        String universityId = "";
-        String firstName = "";
-        String lastName = "";
-        String email = "";
-        String department = "";
-        String level = "";
-        String phone = "";
-        if (cursor != null && cursor.moveToFirst()) {
-            universityId = cursor.getString(cursor.getColumnIndexOrThrow("university_id"));
-            firstName    = cursor.getString(cursor.getColumnIndexOrThrow("first_name"));
-            lastName     = cursor.getString(cursor.getColumnIndexOrThrow("last_name"));
-            email        = cursor.getString(cursor.getColumnIndexOrThrow("email"));
-            department   = cursor.getString(cursor.getColumnIndexOrThrow("department"));
-            level        = cursor.getString(cursor.getColumnIndexOrThrow("level"));
-            phone        = cursor.getString(cursor.getColumnIndexOrThrow("phone"));
+        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        sharedPref = new SharedPreManager(requireContext());
+        String sid = sharedPref.readString("student_id", "");
+
+        Cursor cursor = db.StudentDataID(sid);
+        String passwordValidation = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{6,}$";
+
+
+        if (cursor.moveToFirst()) {
+           String universityId = cursor.getString(1);
+           String firstName    = cursor.getString(2);
+           String lastName     = cursor.getString(3);
+           String email        = cursor.getString(4);
+           String department   = cursor.getString(6);
+           String level        = cursor.getString(7);
+           //String phone        = cursor.getString(6);
+
+            TextView universityIDTV = root.findViewById(R.id.universityID);
+            TextView departmentTV   = root.findViewById(R.id.department);
+            TextView levelTV        = root.findViewById(R.id.StudentLevel);
+            TextView studentName    = root.findViewById(R.id.user_name_display);
+            TextView EmailTV        = root.findViewById(R.id.user_email);
+
+            TextInputEditText firstNameET = root.findViewById(R.id.EditFirst_name);
+            TextInputEditText lastNameET  = root.findViewById(R.id.EditLast_name);
+            //TextInputLayout phoneLayout   = root.findViewById(R.id.StartCPhone_number);
+            //TextInputEditText phoneET     = root.findViewById(R.id.phone_number);
+
+            universityIDTV.setText(universityId);
+            departmentTV.setText(department);
+            levelTV.setText(level);
+            studentName.setText(firstName + " " + lastName);
+            EmailTV.setText(email);
+            firstNameET.setText(firstName);
+            lastNameET.setText(lastName);
+            //phoneET.setText(phone);
         }
-        if (cursor != null) cursor.close();
+
+        Button updatePersonalInfo = root.findViewById(R.id.btn_update_personal_info);
+        Button updatePassword = root.findViewById(R.id.btn_change_password);
+        Button viewHistory = root.findViewById(R.id.btn_view_history);
+        Button logout = root.findViewById(R.id.btn_logout);
 
 
-        TextView universityIDTV = root.findViewById(R.id.universityID);
-        TextView departmentTV   = root.findViewById(R.id.department);
-        TextView levelTV        = root.findViewById(R.id.StudentLevel);
-        TextView studentName    = root.findViewById(R.id.user_name_display);
-        TextView EmailTV        = root.findViewById(R.id.user_email);
+        updatePersonalInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextInputEditText firstNameET = root.findViewById(R.id.EditFirst_name);
+                TextInputEditText lastNameET = root.findViewById(R.id.EditLast_name);
+                //TextInputEditText phoneET = root.findViewById(R.id.phone_number);
+            }
+        });
 
-        TextInputEditText firstNameET = root.findViewById(R.id.EditFirst_name);
-        TextInputEditText lastNameET  = root.findViewById(R.id.EditLast_name);
-        TextInputLayout phoneLayout   = root.findViewById(R.id.StartCPhone_number);
-        TextInputEditText phoneET     = root.findViewById(R.id.phone_number);
+        updatePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextInputEditText password = root.findViewById(R.id.EditCurrent_password);
+                TextInputEditText NewPassword = root.findViewById(R.id.EditNew_password);
+                TextInputEditText confirmPassword = root.findViewById(R.id.EditConfirm_password);
+
+                int pass = 0;
+                if(!NewPassword.getText().toString().trim().matches(passwordValidation)){
+                    NewPassword.setError("Password must be at least 6 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character!");
+                }
+                else{
+                    pass++;
+                }
+                if(!confirmPassword.getText().toString().trim().equals(NewPassword.getText().toString().trim())){
+                    confirmPassword.setError("Passwords must match!");
+                }
+                else{
+                    pass++;
+                }
+                if(!db.checkPassword("1", password.getText().toString().trim())){
+                    password.setError("password is not correct!");
+                }else {
+                    pass++;
+                }
+                if (pass == 3){
+                    db.updatePassword("1", NewPassword.getText().toString().trim());
+                    password.setText("");
+                    NewPassword.setText("");
+                    confirmPassword.setText("");
+                }
+            }
+        });
+
+        viewHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater inflater = LayoutInflater.from(requireContext());
+                View dialogView = inflater.inflate(R.layout.borrowed_history, null);
+                LinearLayout historyContainer = dialogView.findViewById(R.id.BorrowedHistory);
+
+                Cursor cursor1 = db.getBorrowedHistory("1");
+                if (cursor1 != null && cursor1.moveToFirst()) {
+                    do {
+                        String title = cursor1.getString(0);
+                        String reservationDate = cursor1.getString(1);
+                        String status = cursor1.getString(2);
+
+                        View card = inflater.inflate(R.layout.borrowed_card, historyContainer, false);
+
+                        TextView titleTV = card.findViewById(R.id.BookTitle);
+                        TextView reservationDateTV = card.findViewById(R.id.BorrowedDate);
+                        TextView statusTV = card.findViewById(R.id.Status);
+
+                        titleTV.setText(title);
+                        reservationDateTV.setText("Borrowed: " + reservationDate);
+
+                        if ("Overdue".equalsIgnoreCase(status)) {
+                            statusTV.setText("Overdue");
+                            statusTV.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+                        } else if ("Borrowed".equalsIgnoreCase(status)) {
+                            statusTV.setText("Borrowed");
+                            statusTV.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_orange_dark));
+                        } else {
+                            statusTV.setText("Returned");
+                            statusTV.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+                        }
+
+                        historyContainer.addView(card);
+
+                    } while (cursor1.moveToNext());
+                    cursor1.close();
+                }
+
+                new AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .setPositiveButton("Close", null)
+                        .show();
+            }
+        });
 
 
-        universityIDTV.setText(universityId);
-        departmentTV.setText(department);
-        levelTV.setText(level);
-        studentName.setText(firstName + " " + lastName);
-        EmailTV.setText(email);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                startActivity(intent);
+                requireActivity().finish();
+            }
+        });
 
-        firstNameET.setText(firstName);
-        lastNameET.setText(lastName);
-        phoneET.setText(phone);
+        TextView total_borrowed = root.findViewById(R.id.tv_total_borrowed);
+        TextView currently_borrowed = root.findViewById(R.id.tv_currently_borrowed);
+        TextView overdue_books = root.findViewById(R.id.tv_overdue_books);
+
+        int[] counts = db.getBorrowedCounts(sid);
+        total_borrowed.setText(String.valueOf(counts[0]));
+        currently_borrowed.setText(String.valueOf(counts[1]));
+        overdue_books.setText(String.valueOf(counts[2]));
+
+        cursor.close();
         return root;
     }
 }

@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class DataBaseHelper extends SQLiteOpenHelper {
     // Database name LibraryDB and version 3
     // Keep constructor signature as you had it
@@ -103,7 +106,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM Students WHERE university_id = ?", new String[]{universityId});
         return cursor.getCount() <= 0;
-
     }
     public Cursor checkInformations(String emailOrUniversityId, String password){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -158,10 +160,42 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{SId});
     }
 
-    public Cursor StudentDataID(String universityId){
+    public Cursor getFavorites(int tvId, int acc_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM Reading_List WHERE book_id = ? AND student_id = ?", new String[]{String.valueOf(tvId), String.valueOf(acc_id)});
+    }
+
+    public void addFavorite(int book_id, int acc_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        contentValues.put("student_id", acc_id);
+        contentValues.put("book_id", book_id);
+        contentValues.put("added_date",today);
+        db.insert("Reading_List", null, contentValues);
+    }
+
+    public void removeFavorite(int book_id, int acc_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("Reading_List", "book_id = ? AND student_id = ?", new String[]{String.valueOf(book_id), String.valueOf(acc_id)});
+    }
+
+    public boolean isReserved(int studentId, int bookId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM Reservations WHERE student_id = ? AND book_id = ?",
+                new String[]{ String.valueOf(studentId), String.valueOf(bookId) }
+        );
+        return c.getCount() > 0;
+    }
+
+    public Cursor StudentDataUniversityID(String universityId){
         SQLiteDatabase db = this.getWritableDatabase();
         return db.rawQuery("SELECT * FROM Students WHERE university_id = ?", new String[]{universityId});
+    }
 
+    public Cursor StudentDataID(String Id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT * FROM Students WHERE id = ?", new String[]{Id});
     }
 
     public Cursor getAllBooksReading(String SId) {
@@ -212,6 +246,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
+    public boolean reserveBook(int bookId, int studentId, int weeks, String method, String notes) {
+        LocalDate start = LocalDate.now();
+        LocalDate end = start.plusWeeks(weeks);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("student_id", studentId);
+        v.put("book_id", bookId);
+        v.put("reservation_date", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        v.put("due_date", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        v.put("status", "Borrowed");
+        v.put("collection_method", method);
+        v.put("special_notes", notes);
+
+        long rowId = db.insert("Reservations", null, v);
+        return rowId != -1;
+    }
+
+
     public Cursor BookInfo(String bookId){
         SQLiteDatabase db = this.getWritableDatabase();
         return db.rawQuery("SELECT * FROM Books WHERE id = ?", new String[]{bookId});
@@ -219,6 +272,110 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public Cursor getAllBooks(){
         SQLiteDatabase db = this.getWritableDatabase();
         return db.rawQuery("SELECT * FROM Books", null);
+    }
+
+
+    public boolean updatePassword(String SID, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("password", password);
+        int rows = db.update("Students", values, "student_id = ?", new String[]{SID});
+        return rows > 0;
+    }
+
+    public boolean checkPassword(String SID, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM Students WHERE id = ? AND password = ?", new String[]{SID, password});
+        return cursor.getCount() > 0;
+    }
+
+
+    public Cursor getBorrowedHistory(String SId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT b.title, r.reservation_date, r.status " +
+                "FROM Reservations r " +
+                "JOIN Books b ON r.book_id = b.id " +
+                "WHERE r.student_id = ? Order BY r.reservation_date DESC";
+        return db.rawQuery(query, new String[]{SId});
+    }
+
+    public int[] getBorrowedCounts(String studentId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int total = 0, current = 0, overdue = 0;
+
+        Cursor c1 = db.rawQuery(
+                "SELECT COUNT(*) AS total_borrowed " +
+                        "FROM Reservations WHERE student_id = ?",
+                new String[]{studentId});
+        if (c1.moveToFirst()) {
+            total = c1.getInt(c1.getColumnIndexOrThrow("total_borrowed"));
+        }
+        c1.close();
+
+        Cursor c2 = db.rawQuery(
+                "SELECT COUNT(*) AS current_borrowed " +
+                        "FROM Reservations WHERE student_id = ? AND status = 'Borrowed'",
+                new String[]{studentId});
+        if (c2.moveToFirst()) {
+            current = c2.getInt(c2.getColumnIndexOrThrow("current_borrowed"));
+        }
+        c2.close();
+
+        Cursor c3 = db.rawQuery(
+                "SELECT COUNT(*) AS overdue " +
+                        "FROM Reservations WHERE student_id = ? " +
+                        "AND status = 'borrowed' AND due_date < DATE('now')",
+                new String[]{studentId});
+        if (c3.moveToFirst()) {
+            overdue = c3.getInt(c3.getColumnIndexOrThrow("overdue"));
+        }
+        c3.close();
+
+        return new int[]{total, current, overdue};
+    }
+
+    public Cursor getAllStudents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT first_name, last_name,department,level,id FROM Students", null);
+    }
+
+    public void removeStudent(String sid){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("Students", "id = ?", new String[]{sid});
+    }
+
+    public Cursor getAllBooks(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT * FROM Books", null);
+    }
+
+    public void removeBook(String bid){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("Books", "id = ?", new String[]{bid});
+    }
+    public void updateBook(String bid, String title, String author, String isbn, String category, int availability, String publication_year){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("title", title);
+        values.put("author", author);
+        values.put("isbn", isbn);
+        values.put("category", category);
+        values.put("availability", availability);
+        values.put("publication_year", publication_year);
+        db.update("Books", values, "id = ?", new String[]{bid});
+    }
+
+    public void addBook(Books book){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("title", book.getTitle());
+        values.put("author", book.getAuthor());
+        values.put("isbn", book.getIsbn());
+        values.put("category", book.getCategory());
+        values.put("availability", book.getAvailability());
+        values.put("publication_year", book.getPublication_year());
+        values.put("cover_url", book.getCover_url());
+        db.insert("Books", null, values);
     }
 
     public void insertDummyBooks() {

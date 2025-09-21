@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_Manage_Student"
+            android:title="Manage Student" />
+
+        <item
+            android:id="@+id/nav_Books"
+            android:title="Books Management" />
+        <item
+            android:id="@+id/nav_add_new_librarian"
+            android:title="New Librarian" />
+
+        <item
+            android:id="@+id/nav_Reservation"
+            android:title="Reservation Management" />
+
+        <item
+            android:id="@+id/nav_Reports"
+            android:title="Reports" />
+        <item
+            android:id="@+id/nav_Library_Settings"
+            android:title="Library Settings" />
+    </group>
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_logout"
+            android:title="Logout" />
+    </group>
+
+</menu>

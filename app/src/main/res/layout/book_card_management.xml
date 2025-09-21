@@ -1,11 +1,9 @@
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="8dp">
-
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -21,23 +19,13 @@
             android:padding="16dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Book Information"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#2C3E50" />
-
-                <TextView
-                    android:id="@+id/tv_book_id"
+                    android:id="@+id/book_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ID: 1001"
@@ -46,7 +34,8 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp" />
+                    android:paddingVertical="6dp"
+                    android:layout_gravity="left"/>
 
             </LinearLayout>
 
@@ -58,15 +47,15 @@
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_height="160dp"
                     android:layout_marginEnd="16dp"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
                     <ImageView
                         android:id="@+id/iv_book_cover"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_book_placeholder"
                         android:background="#E0E0E0" />
@@ -80,7 +69,7 @@
                     android:orientation="vertical"
                     android:gravity="start">
                     <TextView
-                        android:id="@+id/tv_book_title"
+                        android:id="@+id/book_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="The Great Gatsby"
@@ -91,7 +80,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
-                        android:id="@+id/tv_book_author"
+                        android:id="@+id/book_author"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="by F. Scott Fitzgerald"
@@ -100,7 +89,7 @@
                         android:layout_marginBottom="16dp" />
 
                     <TextView
-                        android:id="@+id/tv_availability_badge"
+                        android:id="@+id/availability_badge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="AVAILABLE"
@@ -111,41 +100,6 @@
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="8dp"
                         android:layout_gravity="start" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
-                        <!-- here is the start icon -->
-                        <!-- here is the plus icon -->
-
-
-                        <CheckBox
-                            android:layout_marginLeft="20dp"
-                            android:id="@+id/starToggle"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:button="@drawable/favorite"
-                            android:padding="0dp"
-                            android:minWidth="0dp"
-                            android:minHeight="0dp"
-                            android:text=""
-                            android:buttonTint="@null"/>
-
-                        <TextView
-                            android:id="@+id/reserveButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="20dp"
-                            android:text="+"
-                            android:textSize="28dp"
-                            android:layout_marginTop="4dp"
-                            android:clickable="true"/>
-
-
-
-                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -190,7 +144,7 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/tv_isbn"
+                            android:id="@+id/isbn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="978-0-7432-7356-5"
@@ -219,7 +173,7 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/tv_publication_year"
+                            android:id="@+id/publication_year"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="1925"
@@ -256,7 +210,7 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/tv_category"
+                            android:id="@+id/category"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Classic Literature"
@@ -285,7 +239,7 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/tv_availability_status"
+                            android:id="@+id/status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="In Stock"
@@ -299,7 +253,34 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="263dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:backgroundTint="#3498DB"
+                    android:text="Edit"
+                    android:textColor="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/btn_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#E74C3C"
+                    android:text="Delete"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-</androidx.cardview.widget.CardView>
+
+</ScrollView>

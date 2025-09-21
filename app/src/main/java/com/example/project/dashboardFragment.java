@@ -77,7 +77,7 @@ public class dashboardFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
         LinearLayout containerBooks = root.findViewById(R.id.scrollViewLayout);
 
-        db = new DataBaseHelper(requireContext(), "AdnanDB", null, 4);
+        db = new DataBaseHelper(requireContext(), "test11", null, 4);
         sharedpref = SharedPreManager.getInstance(requireContext());
         int acc_id = Integer.parseInt(sharedpref.readString("id", ""));
         try (Cursor c = db.getAllBooks()) {
@@ -145,41 +145,41 @@ public class dashboardFragment extends Fragment {
 
                     TextView reserveButton = card.findViewById(R.id.reserveButton);
 
-                        reserveButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if(db.isReserved(acc_id, bookId)){
-                                    Toast.makeText(requireContext(), "You have already reserved this book", Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    LayoutInflater inflater = LayoutInflater.from(requireContext());
-                                    View dialogView = inflater.inflate(R.layout.reservationsfromdashboard, null);
-
-                                    AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                                            .setView(dialogView)
-                                            .create();
-
-                                    dialog.show();
-                                    Button cancel = dialogView.findViewById(R.id.btnCancel);
-                                    Button confirm = dialogView.findViewById(R.id.btnConfirm);
-                                    cancel.setOnClickListener(btn -> {
-                                        dialog.dismiss();
-                                    });
-                                    confirm.setOnClickListener(btn -> {
-                                        Slider slider = dialogView.findViewById(R.id.sliderWeeks);
-                                        RadioGroup rg = dialogView.findViewById(R.id.rgMethod);
-                                        TextInputEditText etNotes = dialogView.findViewById(R.id.etNotes);
-                                        String notes = etNotes.getText().toString();
-                                        int weeks = (int) slider.getValue();
-                                        String method = (rg.getCheckedRadioButtonId() == R.id.rbDigital) ? "digital" : "pickup";
-                                        db.reserveBook(bookId, acc_id, weeks, method, notes);
-                                        Toast.makeText(requireContext(), "Book Reserved", Toast.LENGTH_SHORT).show();
-                                        dialog.dismiss();
-                                    });
-                                }
-
+                    reserveButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(db.isReserved(acc_id, bookId)){
+                                Toast.makeText(requireContext(), "You have already reserved this book", Toast.LENGTH_SHORT).show();
                             }
-                        });
+                            else {
+                                LayoutInflater inflater = LayoutInflater.from(requireContext());
+                                View dialogView = inflater.inflate(R.layout.reservationsfromdashboard, null);
+
+                                AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                                        .setView(dialogView)
+                                        .create();
+
+                                dialog.show();
+                                Button cancel = dialogView.findViewById(R.id.btnCancel);
+                                Button confirm = dialogView.findViewById(R.id.btnConfirm);
+                                cancel.setOnClickListener(btn -> {
+                                    dialog.dismiss();
+                                });
+                                confirm.setOnClickListener(btn -> {
+                                    Slider slider = dialogView.findViewById(R.id.sliderWeeks);
+                                    RadioGroup rg = dialogView.findViewById(R.id.rgMethod);
+                                    TextInputEditText etNotes = dialogView.findViewById(R.id.etNotes);
+                                    String notes = etNotes.getText().toString();
+                                    int weeks = (int) slider.getValue();
+                                    String method = (rg.getCheckedRadioButtonId() == R.id.rbDigital) ? "digital" : "pickup";
+                                    db.reserveBook(bookId, acc_id, weeks, method, notes);
+                                    Toast.makeText(requireContext(), "Book Reserved", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                });
+                            }
+
+                        }
+                    });
                 } while (c.moveToNext());
             }
         } catch (Exception e) {
