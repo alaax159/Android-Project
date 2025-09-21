@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
     // Database name LibraryDB and version 3
@@ -41,6 +43,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "last_name TEXT NOT NULL," +
                 "email TEXT UNIQUE NOT NULL," +
                 "password_hash TEXT NOT NULL," +
+                "phone_number TEXT," +
                 "department TEXT," +
                 "level TEXT)");
 
@@ -53,6 +56,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "due_date TEXT," +
                 "return_date TEXT," +
                 "status TEXT," +
+                "collection_method TEXT," +
+                "special_notes TEXT," +
                 "FOREIGN KEY (student_id) REFERENCES Students(id) ON DELETE CASCADE," +
                 "FOREIGN KEY (book_id) REFERENCES Books(id) ON DELETE CASCADE)");
 
@@ -79,7 +84,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         super.onOpen(db);
         onCreate(db);
     }
-    public void registerStudent(String universityId, String firstName, String lastName, String email, String passwordHash, String department, String level){
+    public void registerStudent(String universityId, String firstName, String lastName, String email, String passwordHash, String department, String level, String phone_number){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("university_id", universityId);
@@ -90,6 +95,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         contentValues.put("password_hash", hashedPassword);
         contentValues.put("department", department);
         contentValues.put("level", level);
+        contentValues.put("phone_number", phone_number);
         db.insert("Students", null, contentValues);
 
     }
@@ -111,6 +117,31 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
 
     }
+    public Cursor getFavorites(int tvId, int acc_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM Reading_List WHERE book_id = ? AND student_id = ?", new String[]{String.valueOf(tvId), String.valueOf(acc_id)});
+    }
+    public void addFavorite(int book_id, int acc_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        contentValues.put("student_id", acc_id);
+        contentValues.put("book_id", book_id);
+        contentValues.put("added_date",today);
+        db.insert("Reading_List", null, contentValues);
+    }
+    public void removeFavorite(int book_id, int acc_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("Reading_List", "book_id = ? AND student_id = ?", new String[]{String.valueOf(book_id), String.valueOf(acc_id)});
+    }
+    public boolean isReserved(int studentId, int bookId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM Reservations WHERE student_id = ? AND book_id = ?",
+                new String[]{ String.valueOf(studentId), String.valueOf(bookId) }
+        );
+        return c.getCount() > 0;
+    }
+
     public Cursor getBooks(String SId) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -149,6 +180,23 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 new String[]{studentId, String.valueOf(bookId)}
         );
     }
+    public boolean reserveBook(int bookId, int studentId, int weeks, String method, String notes) {
+        LocalDate start = LocalDate.now();
+        LocalDate end = start.plusWeeks(weeks);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("student_id", studentId);
+        v.put("book_id", bookId);
+        v.put("reservation_date", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        v.put("due_date", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        v.put("status", "Borrowed");
+        v.put("collection_method", method);
+        v.put("special_notes", notes);
+
+        long rowId = db.insert("Reservations", null, v);
+        return rowId != -1;
+    }
 
     public boolean addToBorrowedBooks(int studentId, int bookId, String reservationDate, String dueDate, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -168,7 +216,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.rawQuery("SELECT * FROM Books WHERE id = ?", new String[]{bookId});
     }
-
+    public Cursor getAllBooks(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT * FROM Books", null);
+    }
 
     public void insertDummyBooks() {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -358,5 +409,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM Reservations", null);
     }
 
+    public void insertNewBook(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values3 = new ContentValues();
+        values3.put("title", "Computer Organization and Architecture: A Modern Approach");
+        values3.put("author", "Adnan Odeh");
+        values3.put("isbn", "9780136042323");
+        values3.put("category", "Hardware Engineering");
+        values3.put("availability", 1);
+        values3.put("cover_url", "https://example.com/ai.jpg");
+        values3.put("publication_year", 2001);
+        db.insert("Books", null, values3);
+    }
 }
 

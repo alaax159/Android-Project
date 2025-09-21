@@ -12,7 +12,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -33,7 +33,8 @@ android {
 
 dependencies {
     implementation("com.hbb20:ccp:2.7.3")
-
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

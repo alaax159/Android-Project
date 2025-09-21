@@ -17,6 +17,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.hbb20.CountryCodePicker;
+
 public class RegistrationActivity extends AppCompatActivity {
 
     DataBaseHelper db;
@@ -66,7 +68,7 @@ public class RegistrationActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                db = new DataBaseHelper(RegistrationActivity.this, "test11", null, 4);
+                db = new DataBaseHelper(RegistrationActivity.this, "AdnanDB", null, 4);
                 int pass = 0;
                 if(!universityID.getText().toString().trim().matches(universityIdValidation) || !db.checkUniversityId(universityID.getText().toString().trim())){
                     universityID.setError("University ID must be Unique and in form YYYY####");
@@ -132,6 +134,8 @@ public class RegistrationActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             register.setText("Registering...");
+                            CountryCodePicker countryCodePicker = findViewById(R.id.countryCodePicker);
+                            String countryCode = countryCodePicker.getSelectedCountryCode();
                             String universityId = universityID.getText().toString().trim();
                             String first_name = firstName.getText().toString().trim();
                             String last_name = lastName.getText().toString().trim();
@@ -139,8 +143,9 @@ public class RegistrationActivity extends AppCompatActivity {
                             String password_hashed = password.getText().toString().trim();
                             String department = departmentSpinner.getSelectedItem().toString();
                             String level = academicSpinner.getSelectedItem().toString();
+                            String phone_number = phoneNumber.getText().toString().trim();
                             //Registring Data to the database
-                            db.registerStudent(universityId, first_name, last_name, emailAddress, password_hashed, department, level);
+                            db.registerStudent(universityId, first_name, last_name, emailAddress, password_hashed, department, level, countryCode + phone_number);
                             register.setText("Registered");
                             Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
                             startActivity(intent);

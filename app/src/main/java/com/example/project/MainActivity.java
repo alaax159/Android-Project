@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
 
         navigationView.setCheckedItem(R.id.nav_dashboard);
         Toast.makeText(MainActivity.this, "Dashboard", Toast.LENGTH_SHORT).show();
-        db = new DataBaseHelper(MainActivity.this, "test11", null, 4);
+        db = new DataBaseHelper(MainActivity.this, "AdnanDB", null, 4);
 
 
 
@@ -88,6 +88,10 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
                 tvUniversityId.setText("ID: " + student.getId());
             }
         }
+        dashboardFragment fragmentMain = new dashboardFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragmentMain)
+                .commit();
 
 //        Rev r = new Rev();
 //        Cursor c = db.getAllReservations();
@@ -110,7 +114,10 @@ public class MainActivity extends AppCompatActivity implements MyBorrowedBooks.C
                 int id = item.getItemId();
 
                 if (id == R.id.nav_dashboard) {
-                    Toast.makeText(MainActivity.this, "Dashboard", Toast.LENGTH_SHORT).show();
+                    dashboardFragment fragment = new dashboardFragment();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, fragment)
+                            .commit();
                 } else if (id == R.id.nav_borrowed_books) {
                     Toast.makeText(MainActivity.this, "Borrowed Books", Toast.LENGTH_SHORT).show();
                     MyBorrowedBooks fragment = new MyBorrowedBooks();

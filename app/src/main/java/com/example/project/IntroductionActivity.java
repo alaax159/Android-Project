@@ -31,7 +31,14 @@ public class IntroductionActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        db = new DataBaseHelper(IntroductionActivity.this, "test11", null, 4);
+        db = new DataBaseHelper(IntroductionActivity.this, "AdnanDB", null, 4);
+
+//        db.insertDummyBooks();
+//        db.insertDummyStudents();
+//        db.insertDummyReservations();
+//        db.insertDummyReadingList();
+//        db.insertNewBook();
+
 
     }
 }

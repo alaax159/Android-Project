@@ -75,7 +75,7 @@ public class ReadingListSection extends Fragment {
         View root = inflater.inflate(R.layout.fragment_reading_list_section, container, false);
         LinearLayout containerBooks = root.findViewById(R.id.containerBooks);
 
-        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        db = new DataBaseHelper(requireContext(), "AdnanDB", null, 4);
 
         try (Cursor cursor = db.getAllBooksReading("1")) {
             if (cursor != null) {

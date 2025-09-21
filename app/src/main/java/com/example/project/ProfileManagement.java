@@ -64,7 +64,7 @@ public class ProfileManagement extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile_management, container, false);
-        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        db = new DataBaseHelper(requireContext(), "AdnanDB", null, 4);
         Cursor cursor = db.StudentDataID("1");
         String universityId = "";
         String firstName = "";
