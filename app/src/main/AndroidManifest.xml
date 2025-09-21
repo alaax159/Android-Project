@@ -12,13 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Project">
         <activity
-            android:name=".BookManagementActivity"
-            android:exported="false" />
-        <activity
             android:name=".LibrarianActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ReservationsActivity"
             android:exported="false" />
         <activity
             android:name=".RegistrationActivity"

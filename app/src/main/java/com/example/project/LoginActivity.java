@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
                 sharedpref = SharedPreManager.getInstance(LoginActivity.this);
-                db = new DataBaseHelper(LoginActivity.this, "AdnanDB", null, 4);
+                db = new DataBaseHelper(LoginActivity.this, "test11", null, 4);
                 Cursor account = db.checkInformations(emailOrUniversityID.getText().toString().trim(), password.getText().toString().trim());
                 int pass = 0;
                 if(emailOrUniversityID.getText().toString().length() == 0){

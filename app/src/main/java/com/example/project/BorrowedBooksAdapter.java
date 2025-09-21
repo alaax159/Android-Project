@@ -53,6 +53,8 @@ public class BorrowedBooksAdapter extends RecyclerView.Adapter<BorrowedBooksAdap
             emoji = "📕 ";
         } else if ("Extended".equalsIgnoreCase(m.status)) {
             emoji = "📙 ";
+        } else if ("Pending".equalsIgnoreCase(m.status)){
+            emoji = "⏳ ";
         } else {
             emoji = "📘 ";
         }

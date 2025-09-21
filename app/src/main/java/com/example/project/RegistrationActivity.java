@@ -68,7 +68,7 @@ public class RegistrationActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                db = new DataBaseHelper(RegistrationActivity.this, "AdnanDB", null, 4);
+                db = new DataBaseHelper(RegistrationActivity.this, "test11", null, 4);
                 int pass = 0;
                 if(!universityID.getText().toString().trim().matches(universityIdValidation) || !db.checkUniversityId(universityID.getText().toString().trim())){
                     universityID.setError("University ID must be Unique and in form YYYY####");

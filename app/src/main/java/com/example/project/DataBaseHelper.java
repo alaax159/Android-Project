@@ -119,30 +119,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
 
     }
-    public Cursor getFavorites(int tvId, int acc_id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM Reading_List WHERE book_id = ? AND student_id = ?", new String[]{String.valueOf(tvId), String.valueOf(acc_id)});
-    }
-    public void addFavorite(int book_id, int acc_id){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        contentValues.put("student_id", acc_id);
-        contentValues.put("book_id", book_id);
-        contentValues.put("added_date",today);
-        db.insert("Reading_List", null, contentValues);
-    }
-    public void removeFavorite(int book_id, int acc_id){
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("Reading_List", "book_id = ? AND student_id = ?", new String[]{String.valueOf(book_id), String.valueOf(acc_id)});
-    }
-    public boolean isReserved(int studentId, int bookId){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM Reservations WHERE student_id = ? AND book_id = ?",
-                new String[]{ String.valueOf(studentId), String.valueOf(bookId) }
-        );
-        return c.getCount() > 0;
-    }
+
+
 
     public Cursor getBooks(String SId) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -246,32 +224,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    public boolean reserveBook(int bookId, int studentId, int weeks, String method, String notes) {
-        LocalDate start = LocalDate.now();
-        LocalDate end = start.plusWeeks(weeks);
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues v = new ContentValues();
-        v.put("student_id", studentId);
-        v.put("book_id", bookId);
-        v.put("reservation_date", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        v.put("due_date", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        v.put("status", "Borrowed");
-        v.put("collection_method", method);
-        v.put("special_notes", notes);
-
-        long rowId = db.insert("Reservations", null, v);
-        return rowId != -1;
-    }
 
 
     public Cursor BookInfo(String bookId){
         SQLiteDatabase db = this.getWritableDatabase();
         return db.rawQuery("SELECT * FROM Books WHERE id = ?", new String[]{bookId});
-    }
-    public Cursor getAllBooks(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT * FROM Books", null);
     }
 
 
