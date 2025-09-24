@@ -3,6 +3,8 @@ package com.example.project;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,15 +25,12 @@ public class IntroductionActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        db = new DataBaseHelper(IntroductionActivity.this, "alaaDB", null, 4);
         Button btnGetStarted = findViewById(R.id.btnGetStarted);
         btnGetStarted.setOnClickListener(v -> {
-            btnGetStarted.setText("Connecting...");
-            Intent intent = new Intent(IntroductionActivity.this, LoginActivity.class);
-            startActivity(intent);
+            String url = "https://68d11b08e6c0cbeb39a38ce2.mockapi.io/Books/categories/Books";
+            new FetchAndInsertBooksTask(IntroductionActivity.this, db, btnGetStarted).execute(url);
         });
-
-        db = new DataBaseHelper(IntroductionActivity.this, "test11", null, 4);
 
 //        db.insertDummyBooks();
 //        db.insertDummyStudents();

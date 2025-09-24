@@ -19,23 +19,32 @@
             android:padding="16dp">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
+
                 <TextView
-                    android:id="@+id/book_id"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Reservation Details"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#2C3E50" />
+
+                <TextView
+                    android:id="@+id/reservation_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ID: 1001"
+                    android:text="ID: R001"
                     android:background="@drawable/id_badge_background"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:layout_gravity="left"/>
+                    android:paddingVertical="6dp" />
 
             </LinearLayout>
 
@@ -68,38 +77,36 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="start">
+
                     <TextView
                         android:id="@+id/book_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="The Great Gatsby"
-                        android:textSize="22sp"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="#2C3E50"
                         android:lineSpacingExtra="2dp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="4dp" />
 
                     <TextView
                         android:id="@+id/book_author"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="by F. Scott Fitzgerald"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:textColor="#7F8C8D"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <TextView
-                        android:id="@+id/availability_badge"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/student_name"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="AVAILABLE"
-                        android:background="@drawable/available_badge_background"
-                        android:textColor="#155724"
-                        android:textSize="12sp"
+                        android:text="Reserved by: John Smith"
+                        android:textSize="14sp"
+                        android:textColor="#2C3E50"
                         android:textStyle="bold"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        android:layout_gravity="start" />
+                        android:layout_marginBottom="12dp" />
 
                 </LinearLayout>
 
@@ -125,7 +132,7 @@
                     android:orientation="horizontal"
                     android:layout_marginBottom="20dp">
 
-                    <!-- ISBN -->
+                    <!-- Student ID -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -136,7 +143,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ISBN"
+                            android:text="STUDENT ID"
                             android:textSize="12sp"
                             android:textColor="#6C757D"
                             android:textStyle="bold"
@@ -144,17 +151,17 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/isbn"
+                            android:id="@+id/student_id"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="978-0-7432-7356-5"
+                            android:text="STU001"
                             android:textSize="14sp"
                             android:textColor="#2C3E50"
                             android:textStyle="bold" />
 
                     </LinearLayout>
 
-                    <!-- Publication Year -->
+                    <!-- Book ID -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -165,7 +172,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="PUBLICATION YEAR"
+                            android:text="BOOK ID"
                             android:textSize="12sp"
                             android:textColor="#6C757D"
                             android:textStyle="bold"
@@ -173,10 +180,10 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/publication_year"
+                            android:id="@+id/book_id"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="1925"
+                            android:text="BK001"
                             android:textSize="14sp"
                             android:textColor="#2C3E50"
                             android:textStyle="bold" />
@@ -189,9 +196,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp">
 
-                    <!-- Category -->
+                    <!-- Reservation Date -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -202,7 +210,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="CATEGORY"
+                            android:text="RESERVED ON"
                             android:textSize="12sp"
                             android:textColor="#6C757D"
                             android:textStyle="bold"
@@ -210,17 +218,17 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/category"
+                            android:id="@+id/reservation_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Classic Literature"
+                            android:text="2024-01-15"
                             android:textSize="14sp"
                             android:textColor="#2C3E50"
                             android:textStyle="bold" />
 
                     </LinearLayout>
 
-                    <!-- Availability Status -->
+                    <!-- Due Date -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -231,7 +239,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="STATUS"
+                            android:text="DUE DATE"
                             android:textSize="12sp"
                             android:textColor="#6C757D"
                             android:textStyle="bold"
@@ -239,10 +247,77 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/status"
+                            android:id="@+id/due_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="In Stock"
+                            android:text="2024-02-15"
+                            android:textSize="14sp"
+                            android:textColor="#E74C3C"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Third Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp">
+
+                    <!-- Return Date -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RETURN DATE"
+                            android:textSize="12sp"
+                            android:textColor="#6C757D"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.1"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/return_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Not returned"
+                            android:textSize="14sp"
+                            android:textColor="#95A5A6"
+                            android:textStyle="italic" />
+
+                    </LinearLayout>
+
+                    <!-- Collection Method -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="COLLECTION"
+                            android:textSize="12sp"
+                            android:textColor="#6C757D"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.1"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/collection_method"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="In-Person"
                             android:textSize="14sp"
                             android:textColor="#2C3E50"
                             android:textStyle="bold" />
@@ -251,31 +326,58 @@
 
                 </LinearLayout>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="263dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="end"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_edit"
-                    android:layout_width="wrap_content"
+                <!-- Special Notes Section -->
+                <LinearLayout
+                    android:id="@+id/layout_special_notes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:backgroundTint="#3498DB"
-                    android:text="Edit"
-                    android:textColor="#FFFFFF" />
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
-                <Button
-                    android:id="@+id/btn_delete"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SPECIAL NOTES"
+                        android:textSize="12sp"
+                        android:textColor="#6C757D"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/special_notes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Student requested extended loan period for research project."
+                        android:textSize="14sp"
+                        android:textColor="#2C3E50"
+                        android:lineSpacingExtra="2dp"
+                        android:padding="12dp" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="#E74C3C"
-                    android:text="Delete"
-                    android:textColor="#FFFFFF" />
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="----"
+                        android:layout_marginEnd="12dp"
+                        android:id="@+id/ac1"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="----"
+                        android:layout_marginEnd="12dp"
+                        android:id="@+id/ac2"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 

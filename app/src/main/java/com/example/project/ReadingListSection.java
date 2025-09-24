@@ -11,12 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.slider.Slider;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -77,7 +81,7 @@ public class ReadingListSection extends Fragment {
         LinearLayout containerBooks = root.findViewById(R.id.containerBooks);
         sharedPref = new SharedPreManager(requireContext());
         String sid = sharedPref.readString("student_id", "");
-        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        db = new DataBaseHelper(requireContext(), "alaaDB", null, 4);
 
         try (Cursor cursor = db.getAllBooksReading(sid)) {
             if (cursor != null) {
@@ -101,40 +105,47 @@ public class ReadingListSection extends Fragment {
                     Author.setText(author);
                     Availability.setText(availability == 1 ? "Available" : "Not Available");
 
-                    btnBorrow.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            String[] options = {"1 week", "2 weeks", "3 weeks", "4 weeks"};
+                    btnBorrow.setOnClickListener(v -> {
+                        LayoutInflater inflater2 = LayoutInflater.from(requireContext());
+                        View dialogView = inflater2.inflate(R.layout.reservationsfromdashboard, null);
 
-                            new AlertDialog.Builder(requireContext())
-                                    .setTitle("Choose Borrowing Duration")
-                                    .setItems(options, (dialog, which) -> {
-                                        int weeks = which + 1; // index 0 = 1 week, 1 = 2 weeks...
-                                        String reservationDate = LocalDate.now().toString();
-                                        String dueDate = LocalDate.now().plusWeeks(weeks).toString();
-                                        boolean success = db.addToBorrowedBooks(
-                                                1,
-                                                bookId,
-                                                reservationDate,
-                                                dueDate,
-                                                "Pending"
-                                        );
-                                        if (success) {
-                                            Toast.makeText(requireContext(),
-                                                    "Waiting librarian to approve your request " + title + " for " + weeks + " week(s)",
-                                                    Toast.LENGTH_SHORT).show();
+                        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                                .setView(dialogView)
+                                .create();
 
-                                            btnBorrow.setEnabled(false);
-                                            btnBorrow.setAlpha(0.5f);
-                                        } else {
-                                            Toast.makeText(requireContext(),
-                                                    "Failed to borrow " + title,
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    })
-                                    .setNegativeButton("Cancel", null)
-                                    .show();
-                        }
+                        dialog.show();
+
+                        Button cancel = dialogView.findViewById(R.id.btnCancel);
+                        Button confirm = dialogView.findViewById(R.id.btnConfirm);
+
+                        cancel.setOnClickListener(btn -> dialog.dismiss());
+
+                        confirm.setOnClickListener(btn -> {
+                            Slider slider = dialogView.findViewById(R.id.sliderWeeks);
+                            RadioGroup rg = dialogView.findViewById(R.id.rgMethod);
+                            TextInputEditText etNotes = dialogView.findViewById(R.id.etNotes);
+
+                            int weeks = (int) slider.getValue();
+                            String method = (rg.getCheckedRadioButtonId() == R.id.rbDigital) ? "digital" : "pickup";
+                            String notes = etNotes.getText() != null ? etNotes.getText().toString() : "";
+
+                            boolean success = db.reserveBook(bookId, Integer.parseInt(sid), weeks, method, notes);
+
+                            if (success) {
+                                Toast.makeText(requireContext(),
+                                        "Book reserved for " + weeks + " week(s), method: " + method,
+                                        Toast.LENGTH_SHORT).show();
+
+                                btnBorrow.setEnabled(false);
+                                btnBorrow.setAlpha(0.5f);
+                            } else {
+                                Toast.makeText(requireContext(),
+                                        "Failed to reserve book",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                            dialog.dismiss();
+                        });
                     });
 
                     btnInfo.setOnClickListener(new View.OnClickListener() {

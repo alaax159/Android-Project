@@ -67,7 +67,7 @@ public class ManageStudents extends Fragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_manage_students, container, false);
 
-        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        db = new DataBaseHelper(requireContext(), "alaaDB", null, 4);
 
         LinearLayout studentContainer = root.findViewById(R.id.studentContainer);
 

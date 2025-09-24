@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
     // Database name LibraryDB and version 3
@@ -102,6 +103,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.insert("Students", null, contentValues);
 
     }
+
+    public void registerLibrarian(String firstName, String lastName, String email, String passwordHash, String phone_number){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("first_name", firstName);
+        contentValues.put("last_name", lastName);
+        contentValues.put("email", email);
+        String hashedPassword = CaeserCipher.encrypt(passwordHash, 5);
+        contentValues.put("password_hash", hashedPassword);
+        contentValues.put("phone_number", phone_number);
+        db.insert("Students", null, contentValues);
+    }
     public boolean checkUniversityId(String universityId){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM Students WHERE university_id = ?", new String[]{universityId});
@@ -120,22 +133,29 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
-
+    public void changeoverDue(String RID){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE Reservations SET status = 'Overdue' WHERE id = ?", new String[]{RID});
+    }
 
     public Cursor getBooks(String SId) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String query = "SELECT " +
-                "b.title AS title, " +
-                "b.author AS author, " +
-                "r.reservation_date AS reservation_date, " +
-                "r.due_date AS due_date, " +
-                "r.status AS status " +
-                "FROM Reservations r " +
-                "JOIN Books b ON r.book_id = b.id " +
-                "WHERE r.student_id = ?";
+        String query =
+                "SELECT " +
+                        "  b.title AS title, " +
+                        "  b.author AS author, " +
+                        "  r.reservation_date AS reservation_date, " +
+                        "  r.due_date AS due_date, " +
+                        "  r.status AS status, " +
+                        "  r.return_date AS return_date, " +
+                        "  r.id AS book_id " +
+                        "FROM Reservations r " +
+                        "JOIN Books b ON r.book_id = b.id " +
+                        "WHERE r.student_id = ? " +
+                        "ORDER BY r.reservation_date DESC";
 
-        return db.rawQuery(query, new String[]{SId});
+        return db.rawQuery(query, new String[]{ SId });
     }
 
     public Cursor getFavorites(int tvId, int acc_id) {
@@ -202,7 +222,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         v.put("book_id", bookId);
         v.put("reservation_date", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         v.put("due_date", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        v.put("status", "Borrowed");
+        v.put("status", "Pending");
         v.put("collection_method", method);
         v.put("special_notes", notes);
 
@@ -281,11 +301,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         Cursor c3 = db.rawQuery(
                 "SELECT COUNT(*) AS overdue " +
-                        "FROM Reservations WHERE student_id = ? " +
-                        "AND status = 'borrowed' AND due_date < DATE('now')",
+                        "FROM Reservations WHERE student_id = ? AND status = 'Overdue'",
                 new String[]{studentId});
         if (c3.moveToFirst()) {
-            overdue = c3.getInt(c3.getColumnIndexOrThrow("overdue"));
+            overdue = c3.getInt(c3.getColumnIndexOrThrow("overdue")); // lowercase alias
         }
         c3.close();
 
@@ -300,6 +319,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void removeStudent(String sid){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("Students", "id = ?", new String[]{sid});
+        db.delete("Reservations", "student_id = ?", new String[]{sid});
     }
 
     public Cursor getAllBooks(){
@@ -336,6 +356,71 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.insert("Books", null, values);
     }
 
+    public void updateStudentInfo(String sid, String firstName, String lastName, String phone){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("first_name", firstName);
+        values.put("last_name", lastName);
+        values.put("phone_number", phone);
+        db.update("Students", values, "id = ?", new String[]{sid});
+    }
+
+
+    public int getActiveStudentsCount() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(DISTINCT student_id) " +
+                        "FROM Reservations " +
+                        "WHERE return_date IS NULL",
+                null
+        );
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+    public String getMostBorrowedBook() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT b.title, COUNT(r.id) AS borrow_count " +
+                        "FROM Books b " +
+                        "JOIN Reservations r ON b.id = r.book_id " +
+                        "GROUP BY b.id, b.title " +
+                        "ORDER BY borrow_count DESC " +
+                        "LIMIT 1",
+                null
+        );
+
+        String result = "No data";
+        if (cursor.moveToFirst()) {
+            String title = cursor.getString(0);
+            int count = cursor.getInt(1);
+            result = title + " (" + count + " borrows)";
+        }
+        cursor.close();
+        return result;
+    }
+
+    public Cursor getOverdueItems() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT b.title, r.reservation_date, r.due_date, s.first_name, s.last_name " +
+                        "FROM Reservations r " +
+                        "JOIN Books b ON r.book_id = b.id " +
+                        "JOIN Students s ON r.student_id = s.id " +
+                        "WHERE r.status = 'Overdue'",
+                null
+        );
+    }
+
+    public Cursor getNewArrivals(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM Books ORDER BY id DESC LIMIT 5", null);
+    }
+
     public void insertDummyBooks() {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -370,15 +455,33 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.insert("Books", null, values3);
     }
 
+
+    public void insertOverDue(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues r3 = new ContentValues();
+        r3.put("student_id", 1);
+        r3.put("book_id", 4);      // Refactoring
+        r3.put("reservation_date", "2025-08-25");
+        r3.put("due_date", "2025-09-10");     // < today's date (2025-09-22), overdue
+        r3.put("return_date", (String) null);
+        r3.put("status", "Borrowed");
+        r3.put("collection_method", "In-person");
+        r3.put("special_notes", "Overdue test case");
+        db.insert("Reservations", null, r3);
+
+    }
     public void insertDummyReservations() {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues r1 = new ContentValues();
-        r1.put("student_id", 1);   // assuming student with id = 1 exists
+        r1.put("student_id", 1);   // Ahmad Odeh
         r1.put("book_id", 2);      // Clean Code
         r1.put("reservation_date", "2025-09-15");
         r1.put("due_date", "2025-10-15");
+        r1.put("return_date", (String) null); // still borrowed
         r1.put("status", "Borrowed");
+        r1.put("collection_method", "In-person");
+        r1.put("special_notes", "Handle carefully");
         db.insert("Reservations", null, r1);
 
         ContentValues r2 = new ContentValues();
@@ -386,56 +489,47 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         r2.put("book_id", 3);      // AI book
         r2.put("reservation_date", "2025-09-10");
         r2.put("due_date", "2025-09-24");
+        r2.put("return_date", "2025-09-20"); // returned early
         r2.put("status", "Returned");
+        r2.put("collection_method", "Digital");
+        r2.put("special_notes", "Good condition");
         db.insert("Reservations", null, r2);
 
-        // Ahmad Odeh -> Introduction to Algorithms
         ContentValues r3 = new ContentValues();
         r3.put("student_id", 1);
         r3.put("book_id", 1);  // Algorithms
         r3.put("reservation_date", "2025-09-10");
         r3.put("due_date", "2025-09-24");
+        r3.put("return_date", (String) null);
         r3.put("status", "Borrowed");
+        r3.put("collection_method", "In-person");
+        r3.put("special_notes", "Extended loan requested");
         db.insert("Reservations", null, r3);
 
-        // Sara Khalil -> Clean Code
         ContentValues r4 = new ContentValues();
-        r4.put("student_id", 2);
-        r4.put("book_id", 2);
+        r4.put("student_id", 2); // Sara
+        r4.put("book_id", 2);    // Clean Code
         r4.put("reservation_date", "2025-09-11");
         r4.put("due_date", "2025-09-25");
+        r4.put("return_date", (String) null);
         r4.put("status", "Borrowed");
+        r4.put("collection_method", "In-person");
+        r4.put("special_notes", "Urgent use");
         db.insert("Reservations", null, r4);
 
-        // Omar Nasser -> AI: A Modern Approach
         ContentValues r5 = new ContentValues();
-        r5.put("student_id", 3);
-        r5.put("book_id", 3);  // AI
+        r5.put("student_id", 3); // Omar
+        r5.put("book_id", 3);    // AI
         r5.put("reservation_date", "2025-09-01");
         r5.put("due_date", "2025-09-15");
+        r5.put("return_date", "2025-09-14");
         r5.put("status", "Returned");
+        r5.put("collection_method", "Digital");
+        r5.put("special_notes", "Returned before deadline");
         db.insert("Reservations", null, r5);
 
-        // Lina Hassan -> Database System Concepts
-        ContentValues r6 = new ContentValues();
-        r6.put("student_id", 4);
-        r6.put("book_id", 4);  // Databases
-        r6.put("reservation_date", "2025-09-05");
-        r6.put("due_date", "2025-09-19");
-        r6.put("status", "Borrowed");
-        db.insert("Reservations", null, r6);
-
-        // Yousef Salem -> Operating System Concepts
-        ContentValues r7 = new ContentValues();
-        r7.put("student_id", 5);
-        r7.put("book_id", 5);  // OS
-        r7.put("reservation_date", "2025-09-02");
-        r7.put("due_date", "2025-09-16");
-        r7.put("status", "Overdue");
-        db.insert("Reservations", null, r7);
-
-
     }
+
 
     public void insertDummyReadingList() {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -462,6 +556,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s1.put("last_name", "Odeh");
         s1.put("email", "ahmad.odeh@university.edu");
         s1.put("password_hash", CaeserCipher.encrypt("Pass@123", 5));
+        s1.put("phone_number", "0591234567");
         s1.put("department", "Computer Science");
         s1.put("level", "Junior");
         db.insert("Students", null, s1);
@@ -472,6 +567,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s2.put("last_name", "Khalil");
         s2.put("email", "sara.khalil@university.edu");
         s2.put("password_hash", CaeserCipher.encrypt("S@ra4567", 5));
+        s2.put("phone_number", "0569876543");
         s2.put("department", "Engineering");
         s2.put("level", "Sophomore");
         db.insert("Students", null, s2);
@@ -482,6 +578,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s3.put("last_name", "Nasser");
         s3.put("email", "omar.nasser@university.edu");
         s3.put("password_hash", CaeserCipher.encrypt("Om@r7890", 5));
+        s3.put("phone_number", "0591112233");
         s3.put("department", "Business");
         s3.put("level", "Senior");
         db.insert("Students", null, s3);
@@ -492,6 +589,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s4.put("last_name", "Hassan");
         s4.put("email", "lina.hassan@university.edu");
         s4.put("password_hash", CaeserCipher.encrypt("L!na2025", 5));
+        s4.put("phone_number", "0564445566");
         s4.put("department", "Literature");
         s4.put("level", "Freshman");
         db.insert("Students", null, s4);
@@ -502,6 +600,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         s5.put("last_name", "Salem");
         s5.put("email", "yousef.salem@university.edu");
         s5.put("password_hash", CaeserCipher.encrypt("Y0us3f!", 5));
+        s5.put("phone_number", "0597778899");
         s5.put("department", "Medicine");
         s5.put("level", "Graduate");
         db.insert("Students", null, s5);
@@ -524,17 +623,98 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM Reservations", null);
     }
 
+    public Cursor getAllReservationsData() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT r.id AS reservation_id, " +
+                        "       b.title, b.author, b.id AS book_id, " +
+                        "       s.id AS student_id, s.first_name, s.last_name, " +
+                        "       r.reservation_date, r.due_date, " +
+                        "       r.collection_method, r.special_notes, r.return_date,r.status " +
+                        "FROM Reservations r " +
+                        "JOIN Books b ON r.book_id = b.id " +
+                        "JOIN Students s ON r.student_id = s.id",
+                null
+        );
+    }
+
+    public void changeStatus(String reservationId, String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", status);
+        db.update("Reservations", values, "id = ?", new String[]{reservationId});
+    }
+
+    public void removeReservation(String reservationId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("Reservations", "id = ?", new String[]{reservationId});
+    }
+    public void changeDueDate(String reservationId, String newDueDate,String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("due_date", newDueDate);
+        values.put("status", status);
+        db.update("Reservations", values, "id = ?", new String[]{reservationId});
+    }
+
     public void insertNewBook(){
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values3 = new ContentValues();
-        values3.put("title", "Computer Organization and Architecture: A Modern Approach");
-        values3.put("author", "Adnan Odeh");
-        values3.put("isbn", "9780136042323");
-        values3.put("category", "Hardware Engineering");
-        values3.put("availability", 1);
-        values3.put("cover_url", "https://example.com/ai.jpg");
-        values3.put("publication_year", 2001);
-        db.insert("Books", null, values3);
+        ContentValues librarian = new ContentValues();
+        librarian.put("university_id", "LIB001");
+        librarian.put("first_name", "Librarian");
+        librarian.put("last_name", "User");
+        librarian.put("email", "librarian@library.edu");
+        librarian.put("password_hash", CaeserCipher.encrypt("Library123!", 5));
+        librarian.put("phone_number", "0590000000");
+        librarian.put("department", "Library Department");
+        librarian.put("level", "Admin");
+        db.insert("Students", null, librarian);
     }
+
+
+    public Cursor filter(String category, int availability, int yearFrom, int yearTo) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT id,title,author,isbn,category,availability,publication_year,cover_url " +
+                        "FROM Books WHERE 1=1"
+        );
+        ArrayList<String> args = new ArrayList<>();
+
+        if (category != null && !category.trim().isEmpty() && !"All".equalsIgnoreCase(category.trim())) {
+            sql.append(" AND category LIKE ? COLLATE NOCASE");
+            args.add("%" + category.trim() + "%");
+        }
+
+        if (availability == 0 || availability == 1) {
+            sql.append(" AND availability = ?");
+            args.add(String.valueOf(availability));
+        }
+
+        sql.append(" AND publication_year BETWEEN ? AND ?");
+        args.add(String.valueOf(yearFrom));
+        args.add(String.valueOf(yearTo));
+
+        sql.append(" ORDER BY title COLLATE NOCASE ASC");
+
+        return db.rawQuery(sql.toString(), args.toArray(new String[0]));
+    }
+
+    public Cursor search(String searchBarValue) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if(searchBarValue.isEmpty()){
+            return db.rawQuery("SELECT * FROM Books", null);
+        }
+        String query = "SELECT * FROM Books WHERE title LIKE ? COLLATE NOCASE OR author LIKE ? COLLATE NOCASE OR isbn LIKE ? COLLATE NOCASE";
+        String[] args = {"%" + searchBarValue + "%", "%" + searchBarValue + "%", "%" + searchBarValue + "%"};
+        return db.rawQuery(query, args);
+    }
+
+    public Cursor categories(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT DISTINCT category FROM Books", null);
+    }
+
+
 }
 

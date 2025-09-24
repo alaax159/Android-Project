@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@color/colorLogoBackground">
 
         <ImageView
             android:id="@+id/imageView"
@@ -22,13 +23,6 @@
             android:src="@drawable/library_logo"
             android:layout_gravity="center" />
 
-        <EditText
-            android:id="@+id/universityID"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="University ID"
-            android:inputType="text"
-            android:layout_marginBottom="10dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -108,27 +102,14 @@
                 android:layout_marginStart="8dp" />
         </LinearLayout>
 
-        <Spinner
-            android:id="@+id/academicLevel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:spinnerMode="dropdown" />
-
-        <Spinner
-            android:id="@+id/department"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:spinnerMode="dropdown" />
-
         <Button
             android:id="@+id/registerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Register"
             android:layout_gravity="center"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:layout_marginTop="15dp"/>
 
     </LinearLayout>
 </ScrollView>

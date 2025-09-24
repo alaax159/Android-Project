@@ -42,6 +42,12 @@ public class LibrarianActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
+        Toast.makeText(LibrarianActivity.this, "nav_Books", Toast.LENGTH_SHORT).show();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, new BookManagment())
+                .commit();
+        toolbar.setTitle("Books Management");
+
 
         toggle = new ActionBarDrawerToggle(
                 this,
@@ -54,7 +60,7 @@ public class LibrarianActivity extends AppCompatActivity {
         toggle.syncState();
 
         navigationView.setCheckedItem(R.id.nav_dashboard);
-        db = new DataBaseHelper(LibrarianActivity.this, "test11", null, 4);
+        db = new DataBaseHelper(LibrarianActivity.this, "alaaDB", null, 4);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -64,6 +70,8 @@ public class LibrarianActivity extends AppCompatActivity {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, new ManageStudents())
                             .commit();
+                    toolbar.setTitle("Student Management");
+
                     Toast.makeText(LibrarianActivity.this, "nav_Manage_Student", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_Books) {
                     Toast.makeText(LibrarianActivity.this, "nav_Books", Toast.LENGTH_SHORT).show();
@@ -72,13 +80,25 @@ public class LibrarianActivity extends AppCompatActivity {
                             .commit();
                     toolbar.setTitle("Books Management");
                 } else if (id == R.id.nav_Reservation) {
-                    Toast.makeText(LibrarianActivity.this, "nav_Reservation", Toast.LENGTH_SHORT).show();
-                    toolbar.setTitle("Library reading list");
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new ReservationManagement())
+                            .commit();
+                    Toast.makeText(LibrarianActivity.this, "Reservation", Toast.LENGTH_SHORT).show();
+                    toolbar.setTitle("Reservation Management");
                 } else if (id == R.id.nav_Reports) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new GenerateReport())
+                            .commit();
+                    toolbar.setTitle("Library Report");
                     Toast.makeText(LibrarianActivity.this, "nav_Reports", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_Library_Settings) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new EditLibrarySettings())
+                            .commit();
                     Toast.makeText(LibrarianActivity.this, "Library_Settings", Toast.LENGTH_SHORT).show();
+                    toolbar.setTitle("Library Settings");
                 } else if (id == R.id.nav_logout) {
+
                     Intent intent = new Intent(LibrarianActivity.this, LoginActivity.class);
                     startActivity(intent);
                     finish();

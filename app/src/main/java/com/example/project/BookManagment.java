@@ -71,7 +71,7 @@ public class BookManagment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_book_managment, container, false);
-        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        db = new DataBaseHelper(requireContext(), "alaaDB", null, 4);
         LinearLayout BookContainer = root.findViewById(R.id.BooksManagementV);
 
         Cursor cursor = db.getAllBooks();
@@ -162,22 +162,21 @@ public class BookManagment extends Fragment {
 
                                     db.updateBook(id1, newTitle, newAuthor, newIsbn, newCategory, newAvailability, newYear);
 
-                                    TextView bookTitleCard = requireView().findViewById(R.id.book_title);
-                                    TextView bookAuthorCard = requireView().findViewById(R.id.book_author);
-                                    TextView isbnCard = requireView().findViewById(R.id.isbn);
-                                    TextView categoryCard = requireView().findViewById(R.id.category);
-                                    TextView statusCard = requireView().findViewById(R.id.status);
-                                    TextView yearCard = requireView().findViewById(R.id.publication_year);
+                                    TextView bookTitleCard = card.findViewById(R.id.book_title);
+                                    TextView bookAuthorCard = card.findViewById(R.id.book_author);
+                                    TextView isbnCard = card.findViewById(R.id.isbn);
+                                    TextView categoryCard = card.findViewById(R.id.category);
+                                    TextView availabilityCard = card.findViewById(R.id.availability_badge); // fixed id
+                                    TextView yearCard = card.findViewById(R.id.publication_year);
 
                                     bookTitleCard.setText(newTitle);
-                                    bookAuthorCard.setText(newAuthor);
+                                    bookAuthorCard.setText("by " + newAuthor);
                                     isbnCard.setText(newIsbn);
                                     categoryCard.setText(newCategory);
-                                    statusCard.setText(newAvailability == 1 ? "Available" : "Unavailable");
+                                    availabilityCard.setText(newAvailability == 1 ? "Available" : "Unavailable");
                                     yearCard.setText(newYear);
 
                                     Toast.makeText(requireContext(), "Book updated successfully", Toast.LENGTH_SHORT).show();
-
                                     dialog.dismiss();
                                 }
                             });
@@ -262,6 +261,10 @@ public class BookManagment extends Fragment {
 
                     Toast.makeText(requireContext(), "Book added successfully", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
+
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.container, new BookManagment())
+                            .commit();
                 });
                 dialog.show();
             }

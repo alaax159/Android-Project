@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -71,7 +72,7 @@ public class ProfileManagement extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile_management, container, false);
-        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        db = new DataBaseHelper(requireContext(), "alaaDB", null, 4);
         sharedPref = new SharedPreManager(requireContext());
         String sid = sharedPref.readString("student_id", "");
 
@@ -84,9 +85,9 @@ public class ProfileManagement extends Fragment {
            String firstName    = cursor.getString(2);
            String lastName     = cursor.getString(3);
            String email        = cursor.getString(4);
-           String department   = cursor.getString(6);
-           String level        = cursor.getString(7);
-           //String phone        = cursor.getString(6);
+           String department   = cursor.getString(7);
+           String level        = cursor.getString(8);
+           String phone        = cursor.getString(6);
 
             TextView universityIDTV = root.findViewById(R.id.universityID);
             TextView departmentTV   = root.findViewById(R.id.department);
@@ -96,8 +97,8 @@ public class ProfileManagement extends Fragment {
 
             TextInputEditText firstNameET = root.findViewById(R.id.EditFirst_name);
             TextInputEditText lastNameET  = root.findViewById(R.id.EditLast_name);
-            //TextInputLayout phoneLayout   = root.findViewById(R.id.StartCPhone_number);
-            //TextInputEditText phoneET     = root.findViewById(R.id.phone_number);
+            TextInputLayout phoneLayout   = root.findViewById(R.id.StartCPhone_number);
+            TextInputEditText phoneET     = root.findViewById(R.id.phone_number);
 
             universityIDTV.setText(universityId);
             departmentTV.setText(department);
@@ -106,7 +107,7 @@ public class ProfileManagement extends Fragment {
             EmailTV.setText(email);
             firstNameET.setText(firstName);
             lastNameET.setText(lastName);
-            //phoneET.setText(phone);
+            phoneET.setText(phone);
         }
 
         Button updatePersonalInfo = root.findViewById(R.id.btn_update_personal_info);
@@ -120,7 +121,9 @@ public class ProfileManagement extends Fragment {
             public void onClick(View v) {
                 TextInputEditText firstNameET = root.findViewById(R.id.EditFirst_name);
                 TextInputEditText lastNameET = root.findViewById(R.id.EditLast_name);
-                //TextInputEditText phoneET = root.findViewById(R.id.phone_number);
+                TextInputEditText phoneET = root.findViewById(R.id.phone_number);
+                db.updateStudentInfo(sid, firstNameET.getText().toString().trim(), lastNameET.getText().toString().trim(), phoneET.getText().toString().trim());
+                Toast.makeText(requireContext(), "Personal Information Updated", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -144,13 +147,13 @@ public class ProfileManagement extends Fragment {
                 else{
                     pass++;
                 }
-                if(!db.checkPassword("1", password.getText().toString().trim())){
+                if(!db.checkPassword(sid, password.getText().toString().trim())){
                     password.setError("password is not correct!");
                 }else {
                     pass++;
                 }
                 if (pass == 3){
-                    db.updatePassword("1", NewPassword.getText().toString().trim());
+                    db.updatePassword(sid, NewPassword.getText().toString().trim());
                     password.setText("");
                     NewPassword.setText("");
                     confirmPassword.setText("");
@@ -165,7 +168,7 @@ public class ProfileManagement extends Fragment {
                 View dialogView = inflater.inflate(R.layout.borrowed_history, null);
                 LinearLayout historyContainer = dialogView.findViewById(R.id.BorrowedHistory);
 
-                Cursor cursor1 = db.getBorrowedHistory("1");
+                Cursor cursor1 = db.getBorrowedHistory(sid);
                 if (cursor1 != null && cursor1.moveToFirst()) {
                     do {
                         String title = cursor1.getString(0);

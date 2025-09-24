@@ -18,6 +18,7 @@
         android:src="@drawable/library_logo" />
 
     <TextView
+        android:id="@+id/introLib"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="The Birzeit University Library Application is a digital platform designed to help students easily access books, journals, and academic resources anytime, anywhere. It allows quick searching, borrowing, and managing of materials while also offering digital access to e-books and research papers, making studying and research more efficient and convenient for students."

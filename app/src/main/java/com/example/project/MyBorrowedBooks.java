@@ -91,7 +91,7 @@ public class MyBorrowedBooks extends Fragment {
         adapter = new BorrowedBooksAdapter();
         rv.setAdapter(adapter);
 
-        db = new DataBaseHelper(requireContext(), "test11", null, 4);
+        db = new DataBaseHelper(requireContext(), "alaaDB", null, 4);
 
 //        if (SID != 0) {
 //
@@ -102,41 +102,46 @@ public class MyBorrowedBooks extends Fragment {
 
     private void reloadBooks() {
         List<BorrowedBook> data = new ArrayList<>();
-        View view = getView();
-        //Toolbar toolbar = view.findViewById(R.id.toolbar);
-        //toolbar.setTitle("eeeeee");
         sharedPref = new SharedPreManager(requireContext());
         String sid = sharedPref.readString("student_id", "");
+
         try (Cursor cursor = db.getBooks(sid)) {
             if (cursor != null) {
-                //toolbar.setTitle("eeeeee");
                 while (cursor.moveToNext()) {
                     String title      = cursor.isNull(0) ? null : cursor.getString(0);
                     String author     = cursor.isNull(1) ? null : cursor.getString(1);
                     String resDate    = cursor.isNull(2) ? null : cursor.getString(2);
                     String dueDate    = cursor.isNull(3) ? null : cursor.getString(3);
                     String status     = cursor.isNull(4) ? null : cursor.getString(4);
+                    String returnDate = cursor.isNull(5) ? null : cursor.getString(5);
+                    String bookId     = cursor.isNull(6) ? null : cursor.getString(6); // make sure you SELECT book_id in your query
 
-                    String returnDate = null;
-                    int returnDateIndex = cursor.getColumnIndex("return_date");
-                    if (returnDateIndex != -1) {
-                        returnDate = cursor.getString(returnDateIndex);
+                    boolean isOverdue = false;
+                    if (dueDate != null && (returnDate == null || returnDate.isEmpty())) {
+                        try {
+                            LocalDate today = LocalDate.now();
+                            LocalDate due   = LocalDate.parse(dueDate);
+                            isOverdue = today.isAfter(due);
+                        } catch (Exception ignored) {}
                     }
 
-                    String fine = "0.00";
-                    if (dueDate != null) {
-                        LocalDate today = LocalDate.now();
-                        LocalDate dueDate2 = LocalDate.parse(dueDate);
-                        if (today.isAfter(dueDate2)) {
-                            fine = "50";
+                    String displayStatus;
+                    if (isOverdue) {
+                        displayStatus = "Overdue";
+                        if (bookId != null) {
+                            db.changeoverDue(bookId);
                         }
+                    } else if (status != null && !status.isEmpty()) {
+                        displayStatus = status;
+                    } else {
+                        displayStatus = "Borrowed";
                     }
 
-                    data.add(new BorrowedBook(title, author, resDate, dueDate, returnDate, status, fine));
+                    String fine = isOverdue ? "50" : "0.00";
+
+                    data.add(new BorrowedBook(title, author, resDate, dueDate, returnDate, displayStatus, fine));
                 }
                 adapter.setItems(data);
-            }else {
-                //toolbar.setTitle("eeeeee");
             }
         } catch (Exception e) {
             e.printStackTrace();
